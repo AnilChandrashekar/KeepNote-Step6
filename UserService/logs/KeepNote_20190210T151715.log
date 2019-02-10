@@ -1,0 +1,10 @@
+2019-02-10 15:17:15 [main] DEBUG c.s.keepnote.service.UserServiceImpl -
+				userId: John123
+2019-02-10 15:17:15 [main] DEBUG c.s.keepnote.service.UserServiceImpl -
+				userName: john
+2019-02-10 15:17:15 [main] DEBUG c.s.keepnote.service.UserServiceImpl -
+				pwd: johnpass
+2019-02-10 15:17:15 [main] DEBUG c.s.keepnote.service.UserServiceImpl -
+				mobile: 1234567789
+2019-02-10 15:17:15 [main] DEBUG c.s.keepnote.service.UserServiceImpl -
+				added Date: Sun Feb 10 15:17:15 UTC 2019

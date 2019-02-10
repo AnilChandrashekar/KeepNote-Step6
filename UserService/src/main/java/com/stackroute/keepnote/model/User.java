@@ -2,10 +2,14 @@ package com.stackroute.keepnote.model;
 
 import java.util.Date;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 /*
  * Please note that this class is annotated with @Document annotation
  * @Document identifies a domain object to be persisted to MongoDB.
  *  */
+@Document
 public class User {
 
 	/*
@@ -17,29 +21,54 @@ public class User {
 	 * method.The value of userAddedDate should not be accepted from the user but
 	 * should be always initialized with the system date.
 	 */
+	@Id
+	private String userId;
+	private String userName;
+	private String userPassword;
+	private String userMobile;
+	private Date userAddedDate;
+	
 	public User() {
 	}
 	public User(String string, String string1, String string2, String string3, Date date) {
+		this.userId = string;
+		this.userName =  string1;
+		this.userPassword = string2;
+		this.userMobile = string3;
+		this.userAddedDate = date;
+		
 	}
 	public String getUserId() {
-		return null;
+		return userId;
 	}
-	public void setUserId(String string) {
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	public void setUserName(String string) {
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	public String getUserPassword() {
-		return null;
+		return userPassword;
 	}
-	public void setUserPassword(String string) {
+	public void setUserPassword(String userPassword) {
+		this.userPassword = userPassword;
 	}
 	public String getUserMobile() {
-		return null;
+		return userMobile;
 	}
-	public void setUserMobile(String string) {
+	public void setUserMobile(String userMobile) {
+		this.userMobile = userMobile;
 	}
-	public void setUserAddedDate(Date date) {
+	public Date getUserAddedDate() {
+		return userAddedDate;
 	}
+	public void setUserAddedDate(Date userAddedDate) {
+		this.userAddedDate = userAddedDate;
+	}
+	
 
 	 
 }

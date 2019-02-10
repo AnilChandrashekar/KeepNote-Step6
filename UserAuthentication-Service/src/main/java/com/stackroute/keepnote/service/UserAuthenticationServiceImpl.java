@@ -1,8 +1,11 @@
 package com.stackroute.keepnote.service;
 
+import org.springframework.stereotype.Service;
+
 import com.stackroute.keepnote.exception.UserAlreadyExistsException;
 import com.stackroute.keepnote.exception.UserNotFoundException;
 import com.stackroute.keepnote.model.User;
+import com.stackroute.keepnote.repository.UserAutheticationRepository;
 
 /*
 * Service classes are used here to implement additional business logic/validation 
@@ -15,7 +18,7 @@ import com.stackroute.keepnote.model.User;
 * */
 
 
-
+@Service
 public class UserAuthenticationServiceImpl implements UserAuthenticationService {
 
     /*
@@ -25,7 +28,12 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
 	 */
 
 
-
+     private UserAutheticationRepository userAutheticationRepository;
+     
+     public UserAuthenticationServiceImpl(UserAutheticationRepository userAutheticationRepository )
+     {
+    	 this.userAutheticationRepository = userAutheticationRepository;
+     }
 
 
      /*
@@ -36,8 +44,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @Override
     public User findByUserIdAndPassword(String userId, String password) throws UserNotFoundException {
 
-      
-        return null;
+    	return userAutheticationRepository.findByUserIdAndUserPassword(userId, password);
     }
 
 
@@ -51,6 +58,18 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @Override
     public boolean saveUser(User user) throws UserAlreadyExistsException {
        
-        return false;
+    	try
+    	{
+    		User userAdded = userAutheticationRepository.save(user);
+	    	if(userAdded!=null)
+	    	{
+	    		return  true;
+	    	}
+    	}
+    	catch(Exception exception)
+    	{
+    		throw new UserAlreadyExistsException("Cannot Register User");
+    	}
+    	throw new UserAlreadyExistsException("Cannot Register User");
     }
 }

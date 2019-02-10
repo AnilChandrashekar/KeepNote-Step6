@@ -1,7 +1,24 @@
 package com.stackroute.keepnote.controller;
 
+import java.util.Date;
 
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import com.stackroute.keepnote.model.User;
 import com.stackroute.keepnote.service.UserAuthenticationService;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 /*
  * As in this assignment, we are working on creating RESTful web service, hence annotate
@@ -11,6 +28,7 @@ import com.stackroute.keepnote.service.UserAuthenticationService;
  * format. Starting from Spring 4 and above, we can use @RestController annotation which 
  * is equivalent to using @Controller and @ResposeBody annotation
  */
+@RestController
 public class UserAuthenticationController {
 
     /*
@@ -19,7 +37,11 @@ public class UserAuthenticationController {
 	 * keyword
 	 */
 
+	private Log log = LogFactory.getLog(getClass());
+	UserAuthenticationService authicationService;
+	
     public UserAuthenticationController(UserAuthenticationService authicationService) {
+    	this.authicationService =authicationService;
 	}
 
 /*
@@ -32,7 +54,23 @@ public class UserAuthenticationController {
 	 * 
 	 * This handler method should map to the URL "/api/v1/auth/register" using HTTP POST method
 	 */
-
+    @PostMapping("/api/v1/auth/register")
+	public ResponseEntity<?> createUser(@RequestBody User user) {
+		log.info("createUser : STARTED");
+		HttpHeaders headers = new HttpHeaders();
+		try {
+			user.setUserAddedDate(new Date());
+			if(authicationService.saveUser(user))
+			{
+				return new ResponseEntity<>(headers, HttpStatus.CREATED);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(headers, HttpStatus.CONFLICT);
+		}
+		log.info("createUser : ENDED");
+		return new ResponseEntity<>(headers, HttpStatus.CREATED);
+	}
 
 
 
@@ -49,6 +87,27 @@ public class UserAuthenticationController {
 	 * This handler method should map to the URL "/api/v1/auth/login" using HTTP POST method
 	*/
 
+    @PostMapping("/api/v1/auth/login")
+   	public ResponseEntity<?> validateUser(@RequestBody User user) {
+   		log.info("validateUser : STARTED");
+   		HttpHeaders headers = new HttpHeaders();
+   		try {
+   			user.setUserAddedDate(new Date());
+   			if(authicationService.findByUserIdAndPassword(user.getUserId(), user.getUserPassword())!=null)
+   		//	if(true)
+   			{
+   				log.info("user authenticated : Generating token");
+   				String token = getToken(user.getUserId(), user.getUserPassword());
+   				log.info("token : "+token);
+   				return new ResponseEntity<>(token, HttpStatus.OK);
+   			}
+   		} catch (Exception e) {
+   			e.printStackTrace();
+   			return new ResponseEntity<>(headers, HttpStatus.CONFLICT);
+   		}
+   		log.info("validateUser : ENDED");
+   		return new ResponseEntity<>(headers, HttpStatus.UNAUTHORIZED);
+   	}
 
 
 
@@ -56,10 +115,42 @@ public class UserAuthenticationController {
 
 // Generate JWT token
 	public String getToken(String username, String password) throws Exception {
-			
-        return null;
-        
-        
+		 //The JWT signature algorithm we will be using to sign the token
+	   // SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+
+	    /*long nowMillis = System.currentTimeMillis();
+	    Date now = new Date(nowMillis);
+
+	    //We will sign our JWT with our ApiKey secret
+	    byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SECRET_KEY);
+	    Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+
+	    //Let's set the JWT Claims
+	    JwtBuilder builder = Jwts.builder().setId(id)
+	            .setIssuedAt(now)
+	            .setSubject(subject)
+	            .setIssuer(issuer)
+	            .signWith(signatureAlgorithm, signingKey);
+	  
+	    //if it has been specified, let's add the expiration
+	    if (ttlMillis > 0) {
+	        long expMillis = nowMillis + ttlMillis;
+	        Date exp = new Date(expMillis);
+	        builder.setExpiration(exp);
+	    }  
+	  
+	    //Builds the JWT and serializes it to a compact, URL-safe string
+	    return builder.compact();*/
+	    
+	    Claims claims = Jwts.claims().setSubject(username);
+        claims.put("username", username + "");
+        claims.put("password", password);
+        claims.put("role", "ADMIN");
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS512, "secret")
+                .compact();
 }
 
 
