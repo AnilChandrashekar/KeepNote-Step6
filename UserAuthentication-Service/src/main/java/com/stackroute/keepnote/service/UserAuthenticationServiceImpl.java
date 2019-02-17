@@ -1,5 +1,7 @@
 package com.stackroute.keepnote.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.stackroute.keepnote.exception.UserAlreadyExistsException;

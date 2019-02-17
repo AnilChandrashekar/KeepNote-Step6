@@ -77,13 +77,13 @@ public class ReminderController {
 	public ResponseEntity<?> createReminder(@RequestBody Reminder reminder,HttpServletRequest request) {
 		log.info("createReminder : STARTED");
 		HttpHeaders headers = new HttpHeaders();
-		String loggedInUser =(String) request.getSession().getAttribute("loggedInUserId");
 		try {
-			reminder.setReminderCreatedBy(loggedInUser);
+			reminder.setReminderCreatedBy((String) request.getSession().getAttribute("loggedInUserId"));
 			reminder.setReminderCreationDate(new Date());
-			if(reminderService.createReminder(reminder)!=null)
+			Reminder reminderInserted =reminderService.createReminder(reminder);
+			if(reminderInserted!=null)
 			{
-				return new ResponseEntity<>(headers, HttpStatus.CREATED);
+				return new ResponseEntity<>(reminderInserted, HttpStatus.CREATED);
 			}
 		} catch (ReminderNotCreatedException e) {
 			e.printStackTrace();
@@ -170,11 +170,12 @@ public class ReminderController {
 	public ResponseEntity<?> getReminderById(@PathVariable("id") String id, HttpServletRequest request) {
 		log.info("getReminderById : STARTED");
 		HttpHeaders headers = new HttpHeaders();
+		Reminder reminder = null;
 		try {
-				Reminder reminder =reminderService.getReminderById(id);
+				 reminder =reminderService.getReminderById(id);
 				if(reminder!=null)
 				{
-					return new ResponseEntity<>(headers, HttpStatus.OK);
+					return new ResponseEntity<>(reminder, HttpStatus.OK);
 					
 				}
 				
@@ -183,7 +184,7 @@ public class ReminderController {
 			return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
 		}
 		log.info("getReminderById : ENDED");
-		return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(reminder, HttpStatus.NOT_FOUND);
 	}
 
 	/*

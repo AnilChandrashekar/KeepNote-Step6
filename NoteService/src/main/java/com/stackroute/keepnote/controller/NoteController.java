@@ -62,6 +62,7 @@ public class NoteController {
 		HttpHeaders headers = new HttpHeaders();
 		try {
 			note.setNoteCreationDate(new Date());
+			note.setNoteCreatedBy((String) request.getSession().getAttribute("loggedInUserId"));
 			if (noteService.createNote(note)) {
 				log.info("Note created successfully.....");
 				return new ResponseEntity<>(headers, HttpStatus.CREATED);

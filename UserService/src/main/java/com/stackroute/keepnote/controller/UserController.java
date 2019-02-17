@@ -1,6 +1,9 @@
 package com.stackroute.keepnote.controller;
 
 import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpHeaders;
@@ -54,11 +57,12 @@ private Log log = LogFactory.getLog(getClass());
 	 * This handler method should map to the URL "/user" using HTTP POST method
 	 */
 	@PostMapping("/api/v1/user")
-	public ResponseEntity<?> registerUser(@RequestBody User user) {
+	public ResponseEntity<?> registerUser(@RequestBody User user, HttpServletRequest request) {
 		log.info("registerUser : STARTED");
 		HttpHeaders headers = new HttpHeaders();
 		try {
 			user.setUserAddedDate(new Date());
+			user.setUserId((String) request.getSession().getAttribute("loggedInUserId"));
 			User userCreated = userService.registerUser(user);
 			log.info("userCreated: "+userCreated);
 			if(userCreated!=null)

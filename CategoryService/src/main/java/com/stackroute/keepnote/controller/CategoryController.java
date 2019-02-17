@@ -66,6 +66,7 @@ public class CategoryController {
 		HttpHeaders headers = new HttpHeaders();
 		try {
 			category.setCategoryCreationDate(new Date());
+			category.setCategoryCreatedBy((String) request.getSession().getAttribute("loggedInUserId"));
 			if(categoryService.createCategory(category)!=null)
 			{
 				return new ResponseEntity<>(headers, HttpStatus.CREATED);
@@ -95,7 +96,6 @@ public class CategoryController {
 													,HttpServletRequest request) {
 		log.info("deleteCategory : STARTED");
 		HttpHeaders headers = new HttpHeaders();
-		String loggedInUser =(String) request.getSession().getAttribute("loggedInUserId");
 		
 		try {
 			if(categoryService.deleteCategory(id))
